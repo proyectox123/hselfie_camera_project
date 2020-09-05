@@ -1,0 +1,64 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.huawei.agconnect'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.mho.android.hselfiecamera"
+        minSdkVersion 23
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release{}
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.release
+            debuggable true
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+
+    def huaweiHmsAccountKitVersion = '5.0.1.301'
+    def huaweiHmsPushKitVersion = '5.0.0.300'
+    def huaweiHmsMLComputerVisionFaceVersion = '2.0.1.300'
+
+    //Account Kit
+    implementation "com.huawei.hms:hwid:$huaweiHmsAccountKitVersion"
+    //Push Kit
+    implementation "com.huawei.hms:push:$huaweiHmsPushKitVersion"
+    // Import the base SDK.
+    implementation "com.huawei.hms:ml-computer-vision-face:$huaweiHmsMLComputerVisionFaceVersion"
+    // Import the contour and key point detection model package.
+    implementation "com.huawei.hms:ml-computer-vision-face-shape-point-model:$huaweiHmsMLComputerVisionFaceVersion"
+    // Import the facial expression detection model package.
+    implementation "com.huawei.hms:ml-computer-vision-face-emotion-model:$huaweiHmsMLComputerVisionFaceVersion"
+    // Import the facial feature detection model package.
+    implementation "com.huawei.hms:ml-computer-vision-face-feature-model:$huaweiHmsMLComputerVisionFaceVersion"
+
+    testImplementation 'junit:junit:4.13'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
