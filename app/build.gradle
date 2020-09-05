@@ -37,6 +37,7 @@ android {
 def appCompatVersion = '1.2.0'
 def constraintLayoutVersion = '2.0.1'
 def coreKTXVersion = '1.3.1'
+def dexterVersion = '6.0.2'
 def huaweiHmsAccountKitVersion = '5.0.1.301'
 def huaweiHmsPushKitVersion = '5.0.0.300'
 def huaweiHmsMLComputerVisionFaceVersion = '2.0.1.300'
@@ -48,6 +49,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "com.google.android.material:material:$materialVersion"
+    implementation "com.karumi:dexter:$dexterVersion"
 
     //Account Kit
     implementation "com.huawei.hms:hwid:$huaweiHmsAccountKitVersion"

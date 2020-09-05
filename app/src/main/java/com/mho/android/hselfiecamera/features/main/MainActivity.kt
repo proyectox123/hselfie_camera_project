@@ -1,6 +1,10 @@
 package com.mho.android.hselfiecamera.features.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.huawei.hms.support.hwid.HuaweiIdAuthManager
@@ -11,12 +15,15 @@ import com.mho.android.hselfiecamera.R
 import com.mho.android.hselfiecamera.features.auth.AuthActivity
 import com.mho.android.hselfiecamera.features.main.MainViewModel.MainNavigation
 import com.mho.android.hselfiecamera.usecases.LogOutHMSUseCase
+import com.mho.android.hselfiecamera.utils.PermissionRequester
 import com.mho.android.hselfiecamera.utils.getViewModel
 import com.mho.android.hselfiecamera.utils.showLongToast
 import com.mho.android.hselfiecamera.utils.startActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    private val permissionRequester = PermissionRequester(this)
 
     private val authParams: HuaweiIdAuthParams by lazy {
         HuaweiIdAuthParamsHelper(HuaweiIdAuthParams.DEFAULT_AUTH_REQUEST_PARAM)
@@ -44,6 +51,8 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.events.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let { validateNavigation(it) }
         })
+
+        permissionRequester.request { validatePermissions(it) }
     }
 
     override fun onBackPressed() { }
@@ -58,5 +67,33 @@ class MainActivity : AppCompatActivity() {
                 showLongToast(R.string.error_log_out_failed)
             }
         }
+    }
+
+    private fun validatePermissions(hasPermissions: Boolean){
+        if(hasPermissions){
+            return
+        }
+
+        showSettingsDialog()
+    }
+
+    private fun showSettingsDialog(){
+        AlertDialog.Builder(this)
+            .setMessage(getString(R.string.title_rejected_permissions_dialog))
+            .setPositiveButton(getString(R.string.option_settings)){ _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivityForResult(intent, REQUEST_CODE_DETAILS_SETTINGS)
+                startActivity(intent)
+            }
+            .setNegativeButton(getString(R.string.option_cancel)) { _, _ -> finish() }
+            .create()
+            .show()
+    }
+
+    companion object {
+
+        private const val REQUEST_CODE_DETAILS_SETTINGS = 200
     }
 }

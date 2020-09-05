@@ -12,9 +12,12 @@
     <string name="error_log_in_failed">Autenticación fallida…</string>
     <string name="error_log_out_failed">Cierre de sesión fallido…</string>
 
+    <string name="option_cancel">Cancelar</string>
     <string name="option_most_people">¡La Mayoria Sonrie!</string>
     <string name="option_nearest_people">¡La persona mas cercana sonrie!</string>
+    <string name="option_settings">Configuración</string>
 
     <string name="title_auth_screen">Bienvenido a HSelfie Camera</string>
     <string name="title_main_screen">@string/app_name</string>
+    <string name="title_rejected_permissions_dialog">Esta aplicación requiere acceso a tu carpeta de medios y a tu cámara para poder funcionar</string>
 </resources>
