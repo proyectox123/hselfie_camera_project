@@ -2,12 +2,19 @@
     <string name="app_name">HSelfieCamera</string>
 
     <string name="body_auth_screen">Bienvenido a la mejor camara de selfies del mercado. Para usarme, recuerda autenticarte con tu Huawei ID</string>
+    <string name="body_main_screen">Existen dos formas de capturar tu selfie. La camara toma tu foto si hay varias personas sonriendo. O toma la foto si hay una persona mas cerca sonriendo. Tu decides!</string>
 
     <string name="content_description_huawei_logo_auth">This is the Huawei\'s logo in the authorization screen.</string>
+    <string name="content_description_huawei_logo_main">This is the Huawei\'s logo in the main screen.</string>
+    <string name="content_description_log_out_icon">This is the log out\'s icon.</string>
 
     <string name="error_log_in_cancelled">Inicio de sesión cancelado</string>
     <string name="error_log_in_failed">Autenticación fallida…</string>
     <string name="error_log_out_failed">Cierre de sesión fallido…</string>
 
+    <string name="option_most_people">¡La Mayoria Sonrie!</string>
+    <string name="option_nearest_people">¡La persona mas cercana sonrie!</string>
+
     <string name="title_auth_screen">Bienvenido a HSelfie Camera</string>
+    <string name="title_main_screen">@string/app_name</string>
 </resources>
