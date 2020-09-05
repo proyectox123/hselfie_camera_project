@@ -9,8 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.MainActivity"/>
-        <activity android:name=".auth.AuthActivity">
+        <activity android:name="com.mho.android.hselfiecamera.features.main.MainActivity"/>
+        <activity android:name="com.mho.android.hselfiecamera.features.auth.AuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

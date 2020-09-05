@@ -1,4 +1,4 @@
-package com.mho.android.hselfiecamera.main
+package com.mho.android.hselfiecamera.features.main
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +8,7 @@ import com.huawei.hms.support.hwid.HuaweiIdAuthManager
 import com.huawei.hms.support.hwid.request.HuaweiIdAuthParams
 import com.huawei.hms.support.hwid.request.HuaweiIdAuthParamsHelper
 import com.mho.android.hselfiecamera.R
-import com.mho.android.hselfiecamera.auth.AuthActivity
+import com.mho.android.hselfiecamera.features.auth.AuthActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
