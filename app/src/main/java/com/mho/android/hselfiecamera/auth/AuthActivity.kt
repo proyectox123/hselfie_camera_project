@@ -1,4 +1,4 @@
-package com.mho.android.hselfiecamera
+package com.mho.android.hselfiecamera.auth
 
 import android.app.Activity
 import android.content.Intent
@@ -8,6 +8,8 @@ import android.widget.Toast
 import com.huawei.hms.support.hwid.HuaweiIdAuthManager
 import com.huawei.hms.support.hwid.request.HuaweiIdAuthParams
 import com.huawei.hms.support.hwid.request.HuaweiIdAuthParamsHelper
+import com.mho.android.hselfiecamera.R
+import com.mho.android.hselfiecamera.main.MainActivity
 import kotlinx.android.synthetic.main.activity_auth.*
 
 class AuthActivity : AppCompatActivity() {
@@ -29,7 +31,10 @@ class AuthActivity : AppCompatActivity() {
                 val authHuaweiIdTask = HuaweiIdAuthManager.parseAuthResultFromIntent(data)
 
                 if (authHuaweiIdTask.isSuccessful){
-                    Toast.makeText(this, "Autenticación exitosa!!", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this, "Autenticación exitosa!!", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } else{
                     Toast.makeText(this, "Autenticación Fallida ...", Toast.LENGTH_LONG).show()
                 }
@@ -48,7 +53,9 @@ class AuthActivity : AppCompatActivity() {
 
         val authManager = HuaweiIdAuthManager.getService(this, authParams)
 
-        startActivityForResult(authManager.signInIntent, REQUEST_CODE_LOGIN_SERVICE_ID)
+        startActivityForResult(authManager.signInIntent,
+            REQUEST_CODE_LOGIN_SERVICE_ID
+        )
     }
 
     companion object {
