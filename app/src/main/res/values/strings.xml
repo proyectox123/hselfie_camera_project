@@ -6,7 +6,8 @@
     <string name="content_description_huawei_logo_auth">This is the Huawei\'s logo in the authorization screen.</string>
 
     <string name="error_log_in_cancelled">Inicio de sesión cancelado</string>
-    <string name="error_log_in_failed">Autenticación Fallida…</string>
+    <string name="error_log_in_failed">Autenticación fallida…</string>
+    <string name="error_log_out_failed">Cierre de sesión fallido…</string>
 
     <string name="title_auth_screen">Bienvenido a HSelfie Camera</string>
 </resources>

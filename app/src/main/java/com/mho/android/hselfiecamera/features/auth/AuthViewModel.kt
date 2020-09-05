@@ -10,12 +10,14 @@ import com.huawei.hms.support.hwid.service.HuaweiIdAuthService
 import com.mho.android.hselfiecamera.features.auth.AuthViewModel.AuthNavigation.*
 import com.mho.android.hselfiecamera.utils.Event
 
-class AuthViewModel: ViewModel() {
+class AuthViewModel(
+    private val authService: HuaweiIdAuthService
+): ViewModel() {
 
     private val _events = MutableLiveData<Event<AuthNavigation>>()
     val events: LiveData<Event<AuthNavigation>> get() = _events
 
-    fun onLogInHuaweiIdAuth(authService: HuaweiIdAuthService){
+    fun onLogInHuaweiIdAuth(){
         _events.value = Event(StartAuthentication(authService, REQUEST_CODE_LOGIN_SERVICE_ID))
     }
 
