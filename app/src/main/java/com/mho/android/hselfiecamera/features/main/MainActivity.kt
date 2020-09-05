@@ -10,6 +10,7 @@ import com.huawei.hms.support.hwid.service.HuaweiIdAuthService
 import com.mho.android.hselfiecamera.R
 import com.mho.android.hselfiecamera.features.auth.AuthActivity
 import com.mho.android.hselfiecamera.features.main.MainViewModel.MainNavigation
+import com.mho.android.hselfiecamera.usecases.LogOutHMSUseCase
 import com.mho.android.hselfiecamera.utils.getViewModel
 import com.mho.android.hselfiecamera.utils.showLongToast
 import com.mho.android.hselfiecamera.utils.startActivity
@@ -26,8 +27,12 @@ class MainActivity : AppCompatActivity() {
         HuaweiIdAuthManager.getService(this, authParams)
     }
 
+    private val logOutHMSUseCase: LogOutHMSUseCase by lazy {
+        LogOutHMSUseCase(authService)
+    }
+
     private val mainViewModel: MainViewModel by lazy {
-        getViewModel { MainViewModel(authService) }
+        getViewModel { MainViewModel(logOutHMSUseCase) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

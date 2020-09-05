@@ -10,8 +10,9 @@ import com.huawei.hms.support.hwid.request.HuaweiIdAuthParamsHelper
 import com.huawei.hms.support.hwid.service.HuaweiIdAuthService
 import com.mho.android.hselfiecamera.R
 import com.mho.android.hselfiecamera.features.auth.AuthViewModel.AuthNavigation
-import com.mho.android.hselfiecamera.features.auth.AuthViewModel.AuthNavigation.StartAuthentication
+import com.mho.android.hselfiecamera.features.auth.AuthViewModel.Companion.REQUEST_CODE_LOGIN_SERVICE_ID
 import com.mho.android.hselfiecamera.features.main.MainActivity
+import com.mho.android.hselfiecamera.usecases.LogInHMSUseCase
 import com.mho.android.hselfiecamera.utils.getViewModel
 import com.mho.android.hselfiecamera.utils.showLongToast
 import com.mho.android.hselfiecamera.utils.startActivity
@@ -33,15 +34,21 @@ class AuthActivity : AppCompatActivity() {
         HuaweiIdAuthManager.getService(this, authParams)
     }
 
+    private val logInHMSUseCase: LogInHMSUseCase by lazy {
+        LogInHMSUseCase()
+    }
+
     private val authViewModel: AuthViewModel by lazy {
-        getViewModel { AuthViewModel(authService) }
+        getViewModel { AuthViewModel(logInHMSUseCase) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
-        btnLogin.setOnClickListener { authViewModel.onLogInHuaweiIdAuth() }
+        btnLogin.setOnClickListener {
+            startActivityForResult(authService.signInIntent, REQUEST_CODE_LOGIN_SERVICE_ID)
+        }
 
         authViewModel.events.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let { validateNavigation(it) }
@@ -55,9 +62,6 @@ class AuthActivity : AppCompatActivity() {
 
     private fun validateNavigation(navigation: AuthNavigation) {
         when(navigation){
-            is StartAuthentication -> navigation.run {
-                startActivityForResult(authService.signInIntent, requestCode)
-            }
             AuthNavigation.NavigateToMain -> {
                 startActivity<MainActivity>{ }
                 finish()
