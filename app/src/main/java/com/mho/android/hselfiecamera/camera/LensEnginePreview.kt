@@ -30,8 +30,62 @@ class LensEnginePreview: ViewGroup {
         addView(surfaceView)
     }
 
-    override fun onLayout(p0: Boolean, p1: Int, p2: Int, p3: Int, p4: Int) {
-        TODO("Not yet implemented")
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int
+    ) {
+        var previewWidth = 320
+        var previewHeight = 240
+        if(lensEngine != null){
+            val size: Size? = lensEngine?.displayDimension
+            if(size != null){
+                previewHeight = size.height
+                previewWidth = size.width
+            }
+        }
+
+        if(context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            previewWidth -= previewHeight
+            previewHeight += previewWidth
+            previewWidth = previewHeight - previewWidth
+        }
+
+        val viewWidth = right - left
+        val viewHeight = bottom - top
+        var childXOffset = 0
+        var childYOffset = 0
+        val widthRatio = viewWidth.toFloat() / previewWidth.toFloat()
+        val heightRatio = viewHeight.toFloat() / previewHeight.toFloat()
+
+        val childWidth: Int
+        val childHeight: Int
+        if(widthRatio > heightRatio){
+            childWidth = viewWidth
+            childHeight = (previewHeight.toFloat() * heightRatio).toInt()
+            childYOffset = (childHeight - viewHeight) / 2
+        } else {
+            childWidth = (previewHeight.toFloat() * heightRatio).toInt()
+            childHeight = viewHeight
+            childXOffset = (childWidth - viewWidth) / 2
+        }
+
+        (0 until childCount).forEach { i ->
+            getChildAt(i).layout(
+                -1 * childXOffset,
+                -1 * childYOffset,
+                childWidth - childXOffset,
+                childHeight - childYOffset
+            )
+        }
+
+        try {
+            startIfReady()
+        } catch (e: IOException){
+            Log.e("Error: ", "It's not possible to initialize the camera.")
+        }
     }
 
     @Throws(IOException::class)
