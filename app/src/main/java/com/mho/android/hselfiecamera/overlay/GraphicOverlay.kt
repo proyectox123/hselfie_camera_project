@@ -37,7 +37,7 @@ class GraphicOverlay: View {
         }
     }
 
-    fun addGraphics(graphic: BaseGraphic){
+    fun addGraphic(graphic: BaseGraphic){
         synchronized(lock) { graphics.add(graphic) }
     }
 

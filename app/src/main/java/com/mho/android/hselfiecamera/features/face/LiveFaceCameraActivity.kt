@@ -6,9 +6,14 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.huawei.hms.mlsdk.MLAnalyzerFactory
 import com.huawei.hms.mlsdk.common.LensEngine
+import com.huawei.hms.mlsdk.common.MLAnalyzer
+import com.huawei.hms.mlsdk.common.MLResultTrailer
+import com.huawei.hms.mlsdk.face.MLFace
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzer
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting
+import com.huawei.hms.mlsdk.face.MLMaxSizeFaceTransactor
 import com.mho.android.hselfiecamera.R
+import com.mho.android.hselfiecamera.overlay.LocalFaceGraphic
 import com.mho.android.hselfiecamera.utils.Constants.BUNDLE_KEY_LENS_TYPE
 import com.mho.android.hselfiecamera.utils.Constants.EXTRA_NAME_DETECT_MODE_CODE
 import com.mho.android.hselfiecamera.utils.Constants.EXTRA_VALUES_DETECT_MODE_CODE_NEAREST_PEOPLE
@@ -21,6 +26,8 @@ class LiveFaceCameraActivity : AppCompatActivity() {
     private var lensEngine: LensEngine? = null
     private var lensType = LensEngine.FRONT_LENS
     private var detectModeCode = 0
+    private val smilingPossibility = 0.95F
+    private var isSafeToTakePicture = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +42,7 @@ class LiveFaceCameraActivity : AppCompatActivity() {
             Log.e("Error: ", "No detection code available.")
         }
 
+        createFaceAnalyzer()
         createLensEngine()
     }
 
@@ -59,15 +67,6 @@ class LiveFaceCameraActivity : AppCompatActivity() {
     }
 
     private fun createLensEngine(){
-        val setting = MLFaceAnalyzerSetting.Factory()
-            .setFeatureType(MLFaceAnalyzerSetting.TYPE_FEATURES)
-            .setKeyPointType(MLFaceAnalyzerSetting.TYPE_UNSUPPORT_KEYPOINTS)
-            .setMinFaceProportion(0.1F)
-            .setTracingAllowed(true)
-            .create()
-
-        analyzer = MLAnalyzerFactory.getInstance().getFaceAnalyzer(setting)
-
         val context = applicationContext
         lensEngine = LensEngine.Creator(context, analyzer)
             .setLensType(lensType)
@@ -76,6 +75,61 @@ class LiveFaceCameraActivity : AppCompatActivity() {
             .enableAutomaticFocus(true)
             .create()
 
+    }
+
+    private fun createFaceAnalyzer(){
+        val setting = MLFaceAnalyzerSetting.Factory()
+            .setFeatureType(MLFaceAnalyzerSetting.TYPE_FEATURES)
+            .setKeyPointType(MLFaceAnalyzerSetting.TYPE_UNSUPPORT_KEYPOINTS)
+            .setMinFaceProportion(0.1F)
+            .setTracingAllowed(true)
+            .create()
+
+        analyzer = MLAnalyzerFactory.getInstance().getFaceAnalyzer(setting)
+        if(detectModeCode == EXTRA_VALUES_DETECT_MODE_CODE_NEAREST_PEOPLE){
+            val transactor = MLMaxSizeFaceTransactor.Creator(analyzer, object: MLResultTrailer<MLFace?>(){
+                override fun objectCreateCallback(itemId: Int, obj: MLFace?) {
+                    faceOverlay.clear()
+                    if(obj == null){
+                        return
+                    }
+
+                    val faceGraphic = LocalFaceGraphic(faceOverlay, obj, this@LiveFaceCameraActivity)
+                    faceOverlay.addGraphic(faceGraphic)
+
+                    val emotion = obj.emotions
+                    if(emotion.smilingProbability >= smilingPossibility){
+                        isSafeToTakePicture = true
+                    }
+                }
+
+                override fun objectUpdateCallback(var1: MLAnalyzer.Result<MLFace?>?, obj: MLFace?) {
+                    faceOverlay.clear()
+                    if(obj == null){
+                        return
+                    }
+
+                    val faceGraphic = LocalFaceGraphic(faceOverlay, obj, this@LiveFaceCameraActivity)
+                    faceOverlay.addGraphic(faceGraphic)
+
+                    val emotion = obj.emotions
+                    if(emotion.smilingProbability >= smilingPossibility && isSafeToTakePicture){
+                        isSafeToTakePicture = true
+                    }
+                }
+
+                override fun lostCallback(result: MLAnalyzer.Result<MLFace?>?) {
+                    faceOverlay.clear()
+                }
+
+                override fun completeCallback() {
+                    faceOverlay.clear()
+                }
+            }).create()
+            analyzer?.setTransactor(transactor)
+        } else {
+
+        }
     }
 
     private fun startLensEngine(){
@@ -96,6 +150,7 @@ class LiveFaceCameraActivity : AppCompatActivity() {
 
     private fun startPreview(view: View?){
         preview.release()
+        createFaceAnalyzer()
         createLensEngine()
         startLensEngine()
     }

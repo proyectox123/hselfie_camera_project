@@ -68,7 +68,7 @@ class LensEnginePreview: ViewGroup {
             childHeight = (previewHeight.toFloat() * heightRatio).toInt()
             childYOffset = (childHeight - viewHeight) / 2
         } else {
-            childWidth = (previewWidth.toFloat() * widthRatio).toInt()
+            childWidth = (previewWidth.toFloat() * heightRatio).toInt()
             childHeight = viewHeight
             childXOffset = (childWidth - viewWidth) / 2
         }

@@ -34,8 +34,8 @@ class LocalFaceGraphic(
 
         val faceShape = face!!.getFaceShape(MLFaceShape.TYPE_FACE)
         val points = faceShape.points
-        val verticalRange = Range(0f, Float.MAX_VALUE)
-        val horizontalRange = Range(0f, Float.MAX_VALUE)
+        val verticalRange = Range(Float.MAX_VALUE, 0f)
+        val horizontalRange = Range(Float.MAX_VALUE, 0f)
 
         fun isNotAValidPoint(point: MLPosition?) =
             point == null || point.x == null || point.y == null
@@ -49,15 +49,15 @@ class LocalFaceGraphic(
             if(point.x < horizontalRange.min) { horizontalRange.min = point.x }
             if(point.y > verticalRange.max) { verticalRange.max = point.y }
             if(point.y < verticalRange.min) { verticalRange.min = point.y }
-
-            val rect = Rect(
-                translateX(horizontalRange.min).toInt(),
-                translateY(verticalRange.min).toInt(),
-                translateX(horizontalRange.max).toInt(),
-                translateY(verticalRange.max).toInt()
-            )
-            canvas?.drawRect(rect, facePaint)
         }
+
+        val rect = Rect(
+            translateX(horizontalRange.min).toInt(),
+            translateY(verticalRange.min).toInt(),
+            translateX(horizontalRange.max).toInt(),
+            translateY(verticalRange.max).toInt()
+        )
+        canvas?.drawRect(rect, facePaint)
     }
 }
 
