@@ -1,6 +1,9 @@
 package com.mho.android.hselfiecamera.features.face
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -26,7 +29,6 @@ class LiveFaceCameraActivity : AppCompatActivity() {
     private var lensEngine: LensEngine? = null
     private var lensType = LensEngine.FRONT_LENS
     private var detectModeCode = 0
-    private var isFront = false
     private val smilingRate = 0.8F
     private val smilingPossibility = 0.95F
     private var isSafeToTakePicture = false
@@ -45,18 +47,17 @@ class LiveFaceCameraActivity : AppCompatActivity() {
         }
 
         facingSwitch.setOnClickListener { view ->
-            isFront = !isFront
-            lensType = if(isFront){
-                LensEngine.FRONT_LENS
-            }else {
+            lensType = if(lensType == LensEngine.FRONT_LENS){
                 LensEngine.BACK_LENS
+            }else{
+                LensEngine.FRONT_LENS
             }
 
             lensEngine?.close()
 
-            startPreview(view)
+            startPreview()
         }
-        restart.setOnClickListener { view -> startPreview(view) }
+        restart.setOnClickListener { startPreview() }
 
         createFaceAnalyzer()
         createLensEngine()
@@ -116,6 +117,7 @@ class LiveFaceCameraActivity : AppCompatActivity() {
                     val emotion = obj.emotions
                     if(emotion.smilingProbability >= smilingPossibility){
                         isSafeToTakePicture = true
+                        handler.sendEmptyMessage(ACTION_TAKE_PHOTO)
                     }
                 }
 
@@ -130,7 +132,8 @@ class LiveFaceCameraActivity : AppCompatActivity() {
 
                     val emotion = obj.emotions
                     if(emotion.smilingProbability >= smilingPossibility && isSafeToTakePicture){
-                        isSafeToTakePicture = true
+                        isSafeToTakePicture = false
+                        handler.sendEmptyMessage(ACTION_TAKE_PHOTO)
                     }
                 }
 
@@ -157,6 +160,7 @@ class LiveFaceCameraActivity : AppCompatActivity() {
 
                     if(flag > faceSparseArray.size() * smilingRate && isSafeToTakePicture){
                         isSafeToTakePicture = false
+                        handler.sendEmptyMessage(ACTION_TAKE_PHOTO)
                     }
                 }
 
@@ -174,6 +178,8 @@ class LiveFaceCameraActivity : AppCompatActivity() {
                 }else {
                     preview.start(lensEngine)
                 }
+
+                isSafeToTakePicture = true
             }catch (e: IOException){
                 lensEngine?.release()
                 lensEngine = null
@@ -181,10 +187,48 @@ class LiveFaceCameraActivity : AppCompatActivity() {
         }
     }
 
-    private fun startPreview(view: View?){
+    private fun startPreview(){
         preview.release()
         createFaceAnalyzer()
         createLensEngine()
         startLensEngine()
+    }
+
+    private fun stopPreview(){
+        restart.visibility = View.VISIBLE
+        lensEngine?.release()
+        isSafeToTakePicture = false
+
+        if(analyzer != null){
+            try {
+                analyzer!!.stop()
+            }catch(e: IOException){
+                Log.e("Error: ", "It's not possible to stop the camera. :(")
+            }
+        }
+    }
+
+    private fun takePhoto(){
+        lensEngine?.photograph(null) { bytes ->
+            handler.sendEmptyMessage(ACTION_STOP_PREVIEW)
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        }
+    }
+
+    private val handler: Handler = object: Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            when(msg.what){
+                ACTION_STOP_PREVIEW -> stopPreview()
+                ACTION_TAKE_PHOTO -> takePhoto()
+                else -> { }
+            }
+        }
+    }
+
+    companion object {
+
+        private const val ACTION_STOP_PREVIEW = 1
+        private const val ACTION_TAKE_PHOTO = 2
     }
 }
