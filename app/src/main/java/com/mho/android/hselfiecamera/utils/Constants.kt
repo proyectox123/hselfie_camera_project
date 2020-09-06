@@ -14,4 +14,8 @@ object Constants {
 
     //Save instance state keys
     const val BUNDLE_KEY_LENS_TYPE = "lensType"
+
+    //Others
+    const val DEFAULT_FOLDER_NAME = "DCIM/Camera"
+    const val MIME_TYPE_IMAGE_PNE = "image/png"
 }
