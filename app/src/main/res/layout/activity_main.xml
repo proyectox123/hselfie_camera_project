@@ -65,7 +65,7 @@
 
             <com.google.android.material.button.MaterialButton
                 style="@style/HuaweiButtonStyle"
-                android:id="@+id/mostPeople"
+                android:id="@+id/btnMostPeople"
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="30dp"
@@ -73,7 +73,7 @@
 
             <com.google.android.material.button.MaterialButton
                 style="@style/HuaweiButtonStyle"
-                android:id="@+id/nearestPeople"
+                android:id="@+id/btnNearestPeople"
                 android:layout_marginEnd="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"

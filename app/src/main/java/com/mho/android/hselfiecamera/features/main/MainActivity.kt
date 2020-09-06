@@ -13,6 +13,7 @@ import com.huawei.hms.support.hwid.request.HuaweiIdAuthParamsHelper
 import com.huawei.hms.support.hwid.service.HuaweiIdAuthService
 import com.mho.android.hselfiecamera.R
 import com.mho.android.hselfiecamera.features.auth.AuthActivity
+import com.mho.android.hselfiecamera.features.face.LiveFaceCameraActivity
 import com.mho.android.hselfiecamera.features.main.MainViewModel.MainNavigation
 import com.mho.android.hselfiecamera.usecases.LogOutHMSUseCase
 import com.mho.android.hselfiecamera.utils.PermissionRequester
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btnLogout.setOnClickListener { mainViewModel.onLogoutHuaweiId() }
+        btnMostPeople.setOnClickListener { startActivity<LiveFaceCameraActivity> { } }
 
         mainViewModel.events.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let { validateNavigation(it) }
