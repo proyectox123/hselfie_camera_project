@@ -26,6 +26,8 @@ class LiveFaceCameraActivity : AppCompatActivity() {
     private var lensEngine: LensEngine? = null
     private var lensType = LensEngine.FRONT_LENS
     private var detectModeCode = 0
+    private var isFront = false
+    private val smilingRate = 0.8F
     private val smilingPossibility = 0.95F
     private var isSafeToTakePicture = false
 
@@ -41,6 +43,20 @@ class LiveFaceCameraActivity : AppCompatActivity() {
         }catch (e: RuntimeException) {
             Log.e("Error: ", "No detection code available.")
         }
+
+        facingSwitch.setOnClickListener { view ->
+            isFront = !isFront
+            lensType = if(isFront){
+                LensEngine.FRONT_LENS
+            }else {
+                LensEngine.BACK_LENS
+            }
+
+            lensEngine?.close()
+
+            startPreview(view)
+        }
+        restart.setOnClickListener { view -> startPreview(view) }
 
         createFaceAnalyzer()
         createLensEngine()
@@ -128,7 +144,24 @@ class LiveFaceCameraActivity : AppCompatActivity() {
             }).create()
             analyzer?.setTransactor(transactor)
         } else {
+            analyzer?.setTransactor(object: MLAnalyzer.MLTransactor<MLFace> {
+                override fun transactResult(result: MLAnalyzer.Result<MLFace>) {
+                    val faceSparseArray = result.analyseList
+                    var flag = 0
+                    for(i in 0 until faceSparseArray.size()){
+                        val emotion = faceSparseArray.valueAt(i).emotions
+                        if(emotion.smilingProbability >= smilingPossibility){
+                            flag++
+                        }
+                    }
 
+                    if(flag > faceSparseArray.size() * smilingRate && isSafeToTakePicture){
+                        isSafeToTakePicture = false
+                    }
+                }
+
+                override fun destroy() { }
+            })
         }
     }
 

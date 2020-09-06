@@ -98,6 +98,7 @@ class LensEnginePreview: ViewGroup {
         this.lensEngine = lensEngine
         if(lensEngine != null){
             startRequested = true
+            startIfReady()
         }
     }
 
