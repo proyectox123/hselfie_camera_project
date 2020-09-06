@@ -27,6 +27,7 @@ class LensEnginePreview: ViewGroup {
     private var overlay: GraphicOverlay? = null
 
     init {
+        surfaceView.holder.addCallback(SurfaceCallback())
         addView(surfaceView)
     }
 
@@ -67,7 +68,7 @@ class LensEnginePreview: ViewGroup {
             childHeight = (previewHeight.toFloat() * heightRatio).toInt()
             childYOffset = (childHeight - viewHeight) / 2
         } else {
-            childWidth = (previewHeight.toFloat() * heightRatio).toInt()
+            childWidth = (previewWidth.toFloat() * widthRatio).toInt()
             childHeight = viewHeight
             childXOffset = (childWidth - viewWidth) / 2
         }

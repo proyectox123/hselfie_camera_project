@@ -16,6 +16,10 @@ import com.mho.android.hselfiecamera.features.auth.AuthActivity
 import com.mho.android.hselfiecamera.features.face.LiveFaceCameraActivity
 import com.mho.android.hselfiecamera.features.main.MainViewModel.MainNavigation
 import com.mho.android.hselfiecamera.usecases.LogOutHMSUseCase
+import com.mho.android.hselfiecamera.utils.Constants.EXTRA_NAME_DETECT_MODE_CODE
+import com.mho.android.hselfiecamera.utils.Constants.EXTRA_VALUES_DETECT_MODE_CODE_MOST_PEOPLE
+import com.mho.android.hselfiecamera.utils.Constants.EXTRA_VALUES_DETECT_MODE_CODE_NEAREST_PEOPLE
+import com.mho.android.hselfiecamera.utils.Constants.REQUEST_CODE_DETAILS_SETTINGS
 import com.mho.android.hselfiecamera.utils.PermissionRequester
 import com.mho.android.hselfiecamera.utils.getViewModel
 import com.mho.android.hselfiecamera.utils.showLongToast
@@ -48,7 +52,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         btnLogout.setOnClickListener { mainViewModel.onLogoutHuaweiId() }
-        btnMostPeople.setOnClickListener { startActivity<LiveFaceCameraActivity> { } }
+        btnMostPeople.setOnClickListener {
+            startLiveFaceCamera(EXTRA_VALUES_DETECT_MODE_CODE_MOST_PEOPLE)
+        }
+        btnNearestPeople.setOnClickListener {
+            startLiveFaceCamera(EXTRA_VALUES_DETECT_MODE_CODE_NEAREST_PEOPLE)
+        }
 
         mainViewModel.events.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let { validateNavigation(it) }
@@ -94,8 +103,9 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    companion object {
-
-        private const val REQUEST_CODE_DETAILS_SETTINGS = 200
+    private fun startLiveFaceCamera(detectModeCode: Int){
+        startActivity<LiveFaceCameraActivity> {
+            putExtra(EXTRA_NAME_DETECT_MODE_CODE, detectModeCode)
+        }
     }
 }
