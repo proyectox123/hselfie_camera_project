@@ -14,7 +14,8 @@ class PermissionRequester(
 
     private val permissions = listOf(
         Manifest.permission.CAMERA,
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
     fun request(continuation: (Boolean) -> Unit) {

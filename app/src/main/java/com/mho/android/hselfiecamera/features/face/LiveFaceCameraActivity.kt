@@ -1,9 +1,13 @@
 package com.mho.android.hselfiecamera.features.face
 
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
+import android.net.Uri
+import android.os.*
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +25,10 @@ import com.mho.android.hselfiecamera.utils.Constants.BUNDLE_KEY_LENS_TYPE
 import com.mho.android.hselfiecamera.utils.Constants.EXTRA_NAME_DETECT_MODE_CODE
 import com.mho.android.hselfiecamera.utils.Constants.EXTRA_VALUES_DETECT_MODE_CODE_NEAREST_PEOPLE
 import kotlinx.android.synthetic.main.activity_live_face_camera.*
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 
 class LiveFaceCameraActivity : AppCompatActivity() {
 
@@ -212,6 +219,83 @@ class LiveFaceCameraActivity : AppCompatActivity() {
         lensEngine?.photograph(null) { bytes ->
             handler.sendEmptyMessage(ACTION_STOP_PREVIEW)
             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            //saveBitmapToGallery(bitmap)
+            saveImage(bitmap = bitmap, context = this, folderName = "DCIM/Camera")
+        }
+    }
+
+    private fun saveBitmapToGallery(bitmap: Bitmap): String{
+        val appDir = File("/storage/emulated/0/DCIM/Camera")
+        if(!appDir.exists()){
+            if(!appDir.mkdir()){
+                Log.e("Error: ", "It's not possible to create the directory.")
+                return ""
+            }
+        }
+
+        val fileName = getString(R.string.app_name) + "_" + System.currentTimeMillis() + ".jpg"
+        val file = File(appDir, fileName)
+        try {
+            val fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+            fos.flush()
+            fos.close()
+
+            val uri = Uri.fromFile(file)
+            sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
+        }catch(e: IOException){
+            e.printStackTrace()
+        }
+
+        return file.absolutePath
+    }
+
+    private fun saveImage(bitmap: Bitmap, context: Context, folderName: String) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            val values = contentValues()
+            values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$folderName")
+            values.put(MediaStore.Images.Media.IS_PENDING, true)
+            val uri: Uri? = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            if (uri != null) {
+                saveImageToStream(bitmap, context.contentResolver.openOutputStream(uri))
+                values.put(MediaStore.Images.Media.IS_PENDING, false)
+                context.contentResolver.update(uri, values, null, null)
+            }
+        } else {
+            val directory = File(Environment.getExternalStorageDirectory().toString() + File.separator + folderName)
+
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
+            val fileName = System.currentTimeMillis().toString() + ".png"
+            val file = File(directory, fileName)
+            saveImageToStream(bitmap, FileOutputStream(file))
+            val values = contentValues()
+            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
+            // .DATA is deprecated in API 29
+            context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        }
+    }
+
+    private fun contentValues() : ContentValues {
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+        values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        }
+
+        return values
+    }
+
+    private fun saveImageToStream(bitmap: Bitmap, outputStream: OutputStream?) {
+        if (outputStream != null) {
+            try {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
