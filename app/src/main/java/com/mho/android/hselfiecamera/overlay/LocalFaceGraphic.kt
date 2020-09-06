@@ -40,9 +40,9 @@ class LocalFaceGraphic(
         fun isNotAValidPoint(point: MLPosition?) =
             point == null || point.x == null || point.y == null
 
-        for(point in points) {
+        points.forEach { point ->
             if(isNotAValidPoint(point)){
-                continue
+                return@forEach
             }
 
             if(point.x > horizontalRange.max) { horizontalRange.max = point.x }
