@@ -2,6 +2,7 @@ package com.mho.android.hselfiecamera.features.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.huawei.hms.support.hwid.HuaweiIdAuthManager
@@ -12,6 +13,7 @@ import com.mho.android.hselfiecamera.R
 import com.mho.android.hselfiecamera.features.auth.AuthViewModel.AuthNavigation
 import com.mho.android.hselfiecamera.features.auth.AuthViewModel.Companion.REQUEST_CODE_LOGIN_SERVICE_ID
 import com.mho.android.hselfiecamera.features.main.MainActivity
+import com.mho.android.hselfiecamera.push.GetTokenAction
 import com.mho.android.hselfiecamera.usecases.LogInHMSUseCase
 import com.mho.android.hselfiecamera.utils.getViewModel
 import com.mho.android.hselfiecamera.utils.showLongToast
@@ -53,6 +55,10 @@ class AuthActivity : AppCompatActivity() {
         authViewModel.events.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let { validateNavigation(it) }
         })
+
+        GetTokenAction().getToken(this) {
+            Log.d("PushToken: ", it)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
